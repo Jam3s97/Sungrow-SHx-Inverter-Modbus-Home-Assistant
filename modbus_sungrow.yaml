@@ -10,8 +10,8 @@ modbus:
     type: tcp
     host: !secret sungrow_modbus_host_ip
     port: !secret sungrow_modbus_port
-    delay: 15 # delay 5 second after connecting
-    timeout: 30 # timeout while waiting for a response before flodding the log with errors
+    delay: 0 # delay 5 second after connecting # adjusted down to zero to test
+    timeout: 10 # timeout while waiting for a response before flodding the log with errors # adjusted down from 30 due to slow register updates
     message_wait_milliseconds: !secret sungrow_modbus_wait_milliseconds # delay between messages, depending on inverter connection
 
     sensors:
@@ -27,42 +27,45 @@ modbus:
         count: 11
         scan_interval: &scan_interval_slowest 600
 
-      - name: Sungrow Version 2
+      # unavailable in my inverter
+      # - name: Sungrow Version 2
         # second part of firmware string
         # SAPPHIRE-H_01011.95.12SAPPHIRE-H_03011.95.12SUBCTL-S_04011.01.01
         # --> SAPPHIRE-H_03011.95.12
-        unique_id: sg_version_2
-        device_address: !secret sungrow_modbus_device_address
-        address: 2596
-        input_type: input
-        data_type: string
-        count: 11
-        scan_interval: *scan_interval_slowest
+      #  unique_id: sg_version_2
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 2596
+      #  input_type: input
+      #  data_type: string
+      #  count: 11
+      #  scan_interval: *scan_interval_slowest
 
-      - name: Sungrow Version 3
+      # unavailable in my inverter
+      # - name: Sungrow Version 3
         # third part of firmware string
         # SAPPHIRE-H_01011.95.12SAPPHIRE-H_03011.95.12SUBCTL-S_04011.01.01
         # --> SUBCTL-S_04011.01.01
-        unique_id: sg_version_3
-        device_address: !secret sungrow_modbus_device_address
-        address: 2612
-        input_type: input
-        data_type: string
-        count: 11
-        scan_interval: *scan_interval_slowest
+      #  unique_id: sg_version_3
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 2612
+      #  input_type: input
+      #  data_type: string
+      #  count: 11
+      #  scan_interval: *scan_interval_slowest
 
-      - name: Sungrow Version 4 (Sungrow Battery)
+      # unavailable in my inverter
+      # - name: Sungrow Version 4 (Sungrow Battery)
         # TODO: cannot test, have no sungrow battery
         # fourth part of firmware string (only for sungrow batteries)
         # SAPPHIRE-H_01011.95.12SAPPHIRE-H_03011.95.12SUBCTL-S_04011.01.01 - XXXX
         # --> XXXX
-        unique_id: sg_version_4_battery
-        device_address: !secret sungrow_modbus_device_address
-        address: 2628
-        input_type: input
-        data_type: string
-        count: 11
-        scan_interval: *scan_interval_slowest
+      #  unique_id: sg_version_4_battery
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 2628
+      #  input_type: input
+      #  data_type: string
+      #  count: 11
+      #  scan_interval: *scan_interval_slowest
 
       - name: Sungrow Protocol Version
         unique_id: sg_protocol_version
@@ -283,31 +286,31 @@ modbus:
         scale: 0.1
         scan_interval: *scan_interval_fast
 
-      - name: Phase B voltage
-        unique_id: sg_phase_b_voltage
-        device_address: !secret sungrow_modbus_device_address
-        address: 5019 # reg: 5020
-        input_type: input
-        data_type: uint16
-        precision: 1
-        unit_of_measurement: V
-        device_class: voltage
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # - name: Phase B voltage
+      #  unique_id: sg_phase_b_voltage
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5019 # reg: 5020
+      #  input_type: input
+      #  data_type: uint16
+      #  precision: 1
+      #  unit_of_measurement: V
+      #  device_class: voltage
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
-      - name: Phase C voltage
-        unique_id: sg_phase_c_voltage
-        device_address: !secret sungrow_modbus_device_address
-        address: 5020 # reg: 5021
-        input_type: input
-        data_type: uint16
-        precision: 1
-        unit_of_measurement: V
-        device_class: voltage
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # - name: Phase C voltage
+      #  unique_id: sg_phase_c_voltage
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5020 # reg: 5021
+      #  input_type: input
+      #  data_type: uint16
+      #  precision: 1
+      #  unit_of_measurement: V
+      #  device_class: voltage
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
       - name: Reactive power
         unique_id: sg_reactive_power
@@ -434,37 +437,37 @@ modbus:
 
         # modbus spec: Only valid when the inverter is directly connected to the smart energy meter. (See note 1);
         # ＞ 0 buy from grid; ＜ 0 sell to grid;
-      - name: Meter phase B active power
-        unique_id: sg_meter_phase_b_active_power
-        device_address: !secret sungrow_modbus_device_address
-        address: 5604 # reg 5605
-        input_type: input
-        data_type: int32
-        swap: word
-        nan_value: 0x7FFFFFFF
-        precision: 0
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        scale: 1
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase B active power
+      #  unique_id: sg_meter_phase_b_active_power
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5604 # reg 5605
+      #  input_type: input
+      #  data_type: int32
+      #  swap: word
+      #  nan_value: 0x7FFFFFFF
+      #  precision: 0
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  scale: 1
+      #  scan_interval: *scan_interval_fast
 
         # modbus spec: Only valid when the inverter is directly connected to the smart energy meter. (See note 1);
         # ＞ 0 buy from grid; ＜ 0 sell to grid;
-      - name: Meter phase C active power
-        unique_id: sg_meter_phase_c_active_power
-        device_address: !secret sungrow_modbus_device_address
-        address: 5606 # reg 5607
-        input_type: input
-        data_type: int32
-        swap: word
-        nan_value: 0x7FFFFFFF
-        precision: 0
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        scale: 1
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase C active power
+      #  unique_id: sg_meter_phase_c_active_power
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5606 # reg 5607
+      #  input_type: input
+      #  data_type: int32
+      #  swap: word
+      #  nan_value: 0x7FFFFFFF
+      #  precision: 0
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  scale: 1
+      #  scan_interval: *scan_interval_fast
 
       - name: BDC rated power
         unique_id: sg_bdc_rated_power
@@ -543,31 +546,31 @@ modbus:
         scale: 1
         scan_interval: *scan_interval_fast
 
-      - name: Backup phase B power
-        unique_id: sg_backup_phase_b_power
-        device_address: !secret sungrow_modbus_device_address
-        address: 5723 # reg 5724
-        input_type: input
-        data_type: int16
-        precision: 0
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        scale: 1
-        scan_interval: *scan_interval_fast
+      # - name: Backup phase B power
+      #  unique_id: sg_backup_phase_b_power
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5723 # reg 5724
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 0
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  scale: 1
+      #  scan_interval: *scan_interval_fast
 
-      - name: Backup phase C power
-        unique_id: sg_backup_phase_c_power
-        device_address: !secret sungrow_modbus_device_address
-        address: 5724 # reg 5725
-        input_type: input
-        data_type: int16
-        precision: 0
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        scale: 1
-        scan_interval: *scan_interval_fast
+      # - name: Backup phase C power
+      #  unique_id: sg_backup_phase_c_power
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5724 # reg 5725
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 0
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  scale: 1
+      #  scan_interval: *scan_interval_fast
 
       - name: Total backup power
         device_address: !secret sungrow_modbus_device_address
@@ -597,31 +600,31 @@ modbus:
         scale: 0.1
         scan_interval: *scan_interval_fast
 
-      - name: Meter phase B voltage
-        unique_id: sg_meter_phase_b_voltage
-        device_address: !secret sungrow_modbus_device_address
-        address: 5741 # reg 5742
-        input_type: input
-        data_type: int16
-        precision: 1
-        unit_of_measurement: V
-        device_class: voltage
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase B voltage
+      #  unique_id: sg_meter_phase_b_voltage
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5741 # reg 5742
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 1
+      #  unit_of_measurement: V
+      #  device_class: voltage
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
-      - name: Meter phase C voltage
-        unique_id: sg_meter_phase_c_voltage
-        device_address: !secret sungrow_modbus_device_address
-        address: 5742 # reg 5743
-        input_type: input
-        data_type: int16
-        precision: 1
-        unit_of_measurement: V
-        device_class: voltage
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase C voltage
+      #  unique_id: sg_meter_phase_c_voltage
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5742 # reg 5743
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 1
+      #  unit_of_measurement: V
+      #  device_class: voltage
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
       - name: Meter phase A current
         unique_id: sg_meter_phase_a_current
@@ -636,31 +639,31 @@ modbus:
         scale: 0.01
         scan_interval: *scan_interval_fast
 
-      - name: Meter phase B current
-        unique_id: sg_meter_phase_b_current
-        device_address: !secret sungrow_modbus_device_address
-        address: 5744 # reg 5745
-        input_type: input
-        data_type: uint16
-        precision: 2
-        unit_of_measurement: A
-        device_class: current
-        state_class: measurement
-        scale: 0.01
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase B current
+      #  unique_id: sg_meter_phase_b_current
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5744 # reg 5745
+      # input_type: input
+      #  data_type: uint16
+      #  precision: 2
+      #  unit_of_measurement: A
+      #  device_class: current
+      #  state_class: measurement
+      #  scale: 0.01
+      #  scan_interval: *scan_interval_fast
 
-      - name: Meter phase C current
-        unique_id: sg_meter_phase_c_current
-        device_address: !secret sungrow_modbus_device_address
-        address: 5745 # reg 5746
-        input_type: input
-        data_type: uint16
-        precision: 2
-        unit_of_measurement: A
-        device_class: current
-        state_class: measurement
-        scale: 0.01
-        scan_interval: *scan_interval_fast
+      # - name: Meter phase C current
+      #  unique_id: sg_meter_phase_c_current
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5745 # reg 5746
+      #  input_type: input
+      #  data_type: uint16
+      #  precision: 2
+      #  unit_of_measurement: A
+      #  device_class: current
+      #  state_class: measurement
+      #  scale: 0.01
+      #  scan_interval: *scan_interval_fast
 
       # NOTE: in old modbus doc version this was called "system state"
       # but has been renamed to "running state"
@@ -954,31 +957,31 @@ modbus:
         scale: 0.1
         scan_interval: *scan_interval_fast
 
-      - name: Phase B current
-        unique_id: sg_phase_b_current
-        device_address: !secret sungrow_modbus_device_address
-        address: 13031 # reg 13032
-        input_type: input
-        data_type: int16
-        precision: 1
-        unit_of_measurement: A
-        device_class: current
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # - name: Phase B current
+      #  unique_id: sg_phase_b_current
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 13031 # reg 13032
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 1
+      #  unit_of_measurement: A
+      #  device_class: current
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
-      - name: Phase C current
-        unique_id: sg_phase_c_current
-        device_address: !secret sungrow_modbus_device_address
-        address: 13032 # reg 13033
-        input_type: input
-        data_type: int16
-        precision: 1
-        unit_of_measurement: A
-        device_class: current
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      #- name: Phase C current
+      #  unique_id: sg_phase_c_current
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 13032 # reg 13033
+      #  input_type: input
+      #  data_type: int16
+      #  precision: 1
+      #  unit_of_measurement: A
+      #  device_class: current
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
       - name: Total active power
         unique_id: sg_total_active_power
@@ -1156,7 +1159,7 @@ modbus:
         device_class: battery
         state_class: measurement
         scale: 0.1
-        scan_interval: *scan_interval_fast
+        scan_interval: *scan_interval_medium
 
       - name: Battery min SoC
         unique_id: uid_sg_battery_min_soc
@@ -1169,7 +1172,7 @@ modbus:
         device_class: battery
         state_class: measurement
         scale: 0.1
-        scan_interval: *scan_interval_fast
+        scan_interval: *scan_interval_medium
 
       # in the documentation this is called "feed-in power limit"
       - name: Export power limit
@@ -1244,7 +1247,7 @@ modbus:
         device_class: battery
         state_class: measurement
         scale: 1
-        scan_interval: *scan_interval_fast
+        scan_interval: *scan_interval_medium
 
       # Inverter Firmware version from register 13250 to 13264 as UTF8 string
       # NOTE: SH3.0-10RS and MG5-6RL are NOT supported
@@ -1329,7 +1332,7 @@ modbus:
         device_class: power
         state_class: measurement
         scale: 10
-        scan_interval: *scan_interval_fast
+        scan_interval: *scan_interval_medium
 
       # undocumented sensor (reverse engineered by some guys of photovoltaikforum.com and forum.iobroker.net )
       - name: Battery discharging start power
@@ -1343,7 +1346,7 @@ modbus:
         device_class: power
         state_class: measurement
         scale: 10
-        scan_interval: *scan_interval_fast
+        scan_interval: *scan_interval_medium
 
       #####################
       # modbus switches
@@ -1727,9 +1730,6 @@ template:
                 {% if dev.startswith('SH') and 'RT' in dev %}
                   {# SH*RT* devices (e.g. SH10RT, SH8.0RT-20, SH8.0RT-V112 or SH10RT-V122) #}
                   {{ (value | float / 10) | int }}
-                {% elif dev.startswith('SH') and 'RS' in dev %}
-                  {# SH*RS* devices (e.g. SH10RS) #}
-                  {{ (value | float / 10) | int }}
                 {% else %}
                   {{ value | int }}
                 {% endif %}
@@ -1784,21 +1784,21 @@ template:
         availability: "{{ states('sensor.phase_a_voltage')|is_number and states('sensor.phase_a_current')|is_number }}"
         state: "{{ (states('sensor.phase_a_voltage') | float * states('sensor.phase_a_current') | float) |int }}"
 
-      - name: Phase B power
-        unique_id: sg_phase_b_power
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        availability: "{{ states('sensor.phase_b_voltage')|is_number and states('sensor.phase_b_current')|is_number }}"
-        state: "{{ (states('sensor.phase_b_voltage') | float * states('sensor.phase_b_current') | float) |int }}"
+      #- name: Phase B power
+      #  unique_id: sg_phase_b_power
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  availability: "{{ states('sensor.phase_b_voltage')|is_number and states('sensor.phase_b_current')|is_number }}"
+      #  state: "{{ (states('sensor.phase_b_voltage') | float * states('sensor.phase_b_current') | float) |int }}"
 
-      - name: Phase C power
-        unique_id: sg_phase_c_power
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        availability: "{{ states('sensor.phase_c_voltage')|is_number and states('sensor.phase_c_current')|is_number }}"
-        state: "{{ (states('sensor.phase_c_voltage') | float * states('sensor.phase_c_current') | float) |int }}"
+      #- name: Phase C power
+      #  unique_id: sg_phase_c_power
+      #  unit_of_measurement: W
+      #  device_class: power
+      #  state_class: measurement
+      #  availability: "{{ states('sensor.phase_c_voltage')|is_number and states('sensor.phase_c_current')|is_number }}"
+      #  state: "{{ (states('sensor.phase_c_voltage') | float * states('sensor.phase_c_current') | float) |int }}"
 
       - name: Sungrow inverter state
         unique_id: sg_inverter_state
