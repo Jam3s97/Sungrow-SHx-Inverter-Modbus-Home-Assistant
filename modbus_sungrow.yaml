@@ -1099,6 +1099,28 @@ modbus:
         state_class: measurement
         scan_interval: *scan_interval_fast
 
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
+      - name: Cut PV generation enable raw
+        unique_id: sg_cut_pv_generation_enable_raw
+        device_address: !secret sungrow_modbus_device_address
+        address: &sg_reg_cut_pv_gen 13017 # reg 13018
+        input_type: holding
+        data_type: uint16
+        state_class: measurement
+        scan_interval: *scan_interval_fast
+
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
+      - name: Cut PV generation 31212 enable raw
+        unique_id: sg_cut_pv_generation_31212_enable_raw
+        device_address: !secret sungrow_modbus_device_address
+        address: &sg_reg_cut_pv_gen_31212 31211 # reg 31212
+        input_type: holding
+        data_type: uint16
+        state_class: measurement
+        scan_interval: *scan_interval_fast
+
       # BUG: 2026-01-10. Deactivated for now, see issue #643
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/643
       # TODO test. Does this control, if the standby goes into standby at night?
@@ -1215,10 +1237,12 @@ modbus:
       # MG5-6RL is not supported.
       # 0xAA: Enable
       # 0x55: Disable
+	  # Updated Reg from 13088 # reg 13089 to 31203 # reg 31204
+	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
       - name: Active power limitation raw
         unique_id: sg_active_power_limitation_raw
         device_address: !secret sungrow_modbus_device_address
-        address: &reg_active_power_limitation_raw 13088 # reg 13089
+        address: &reg_active_power_limitation_raw 31203 # reg 31204
         input_type: holding
         data_type: uint16
         scan_interval: *scan_interval_fast
@@ -1226,10 +1250,12 @@ modbus:
 
       # MG5-6RL is not supported.
       # 0-1000
+	  # Updated Reg from 13089 # reg 13090 to 31204 # reg 31205
+	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
       - name: Active power limitation ratio raw
         unique_id: sg_active_power_limitation_ratio_raw
         device_address: !secret sungrow_modbus_device_address
-        address: &reg_active_power_limitation_ratio_raw 13089 # reg 13090
+        address: &reg_active_power_limitation_ratio_raw 31204 # reg 31205
         input_type: holding
         data_type: uint16
         scan_interval: *scan_interval_fast
@@ -1409,6 +1435,38 @@ modbus:
           state_on: 0xAA
           state_off: 0x55
           delay: 1
+
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
+      - name: Cut PV generation
+        unique_id: sg_cut_pv_generation
+        slave: !secret sungrow_modbus_device_address
+        address: *sg_reg_cut_pv_gen
+        write_type: holding
+        command_on: 170
+        command_off: 85
+        scan_interval: 10
+        verify:
+          input_type: holding
+          address: *sg_reg_cut_pv_gen
+          state_on: 170
+          state_off: 85
+
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
+      - name: Cut PV generation 31212
+        unique_id: sg_cut_pv_generation_31212
+        slave: !secret sungrow_modbus_device_address
+        address: *sg_reg_cut_pv_gen_31212
+        write_type: holding
+        command_on: 170
+        command_off: 85
+        scan_interval: 10
+        verify:
+          input_type: holding
+          address: *sg_reg_cut_pv_gen_31212
+          state_on: 170
+          state_off: 85
 
 sensor:
   - platform: filter
@@ -1737,6 +1795,55 @@ template:
           - action: homeassistant.update_entity
             target:
               entity_id: sensor.export_power_limit
+
+      # Added 6/3/26 JT
+	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      - name: Active Power Limit (W)
+        unique_id: uid_active_power_limit_w
+        min: "0"
+        max: "{{ states('sensor.inverter_rated_output') | int(10000) }}"
+        step: "100"
+        availability: >
+          {{ states('sensor.active_power_limitation_ratio_raw') not in ['unknown','unavailable']
+             and states('sensor.inverter_rated_output') not in ['unknown','unavailable'] }}
+        # Modbus → UI
+        state: >-
+          {% set base = states('sensor.inverter_rated_output') | float(10000) %}
+          {% set pct  = states('sensor.active_power_limitation_ratio_raw') | float(0) %}
+          {{ (base * pct / 100) | round(0) | int }}
+        # UI → Modbus
+        set_value:
+          - variables:
+              base: "{{ states('sensor.inverter_rated_output') | float(10000) }}"
+              pct: "{{ (value / base * 100) if base > 0 else 0 }}"
+              pct_clamped: "{{ [ [pct, 100] | min, 0 ] | max }}"
+              ratio_reg: "{{ ((pct_clamped | float(0)) * 10) | round(0) | int }}"
+              enable_code: 0x00AA
+              disable_code: 0x0055
+          - action: modbus.write_register
+            data:
+              hub: *sg_hub_name
+              slave: !secret sungrow_modbus_device_address
+              address: *reg_active_power_limitation_ratio_raw
+              value: "{{ ratio_reg }}"
+          - action: modbus.write_register
+            data:
+              hub: *sg_hub_name
+              slave: !secret sungrow_modbus_device_address
+              address: *reg_active_power_limitation_raw
+              value: "{{ enable_code if pct_clamped < 100 else disable_code }}"
+          - action: modbus.write_register
+            data:
+              hub: *sg_hub_name
+              slave: !secret sungrow_modbus_device_address
+              address: *sg_reg_apl_shutdown_on_zero_raw
+              value: "{{ disable_code }}"
+          - action: homeassistant.update_entity
+            target:
+              entity_id:
+                - sensor.active_power_limitation_ratio_raw
+                - sensor.active_power_limitation_raw
+                - sensor.apl_shutdown_at_zero_raw
 
   ####################
   # template: sensor
@@ -2100,6 +2207,36 @@ template:
               + states('sensor.total_battery_discharge')|float
             )
           }}
+
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      - name: Active Power Limitation
+        unique_id: sg_active_power_limitation
+        device_class: enum
+        availability: >
+          {{ states('sensor.active_power_limitation_raw') not in ['unknown','unavailable'] }}
+        state: >-
+          {% set code = states('sensor.active_power_limitation_raw')|int(0) %}
+          {% set map = { 
+            0x00AA:'Enabled',
+            0x0055:'Disabled'
+          } %}
+          {{ map.get(code, 'Unknown - should not see me! code: ' ~ code) }}
+
+      # Added 6/3/26 JT
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      - name: APL shutdown at 0%
+        unique_id: sg_apl_shutdown_at_zero
+        device_class: enum
+        availability: >
+          {{ states('sensor.apl_shutdown_at_zero_raw') not in ['unknown','unavailable'] }}
+        state: >-
+          {% set code = states('sensor.apl_shutdown_at_zero_raw')|int(0) %}
+          {% set map = { 
+            0x00AA:'On',
+            0x0055:'Off'
+            } %}
+          {{ map.get(code, 'Unknown - should not see me! code: ' ~ code) }}
 
   ###################
   # template: switch
