@@ -1237,8 +1237,8 @@ modbus:
       # MG5-6RL is not supported.
       # 0xAA: Enable
       # 0x55: Disable
-	  # Updated Reg from 13088 # reg 13089 to 31203 # reg 31204
-	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      # Updated Reg from 13088 # reg 13089 to 31203 # reg 31204
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
       - name: Active power limitation raw
         unique_id: sg_active_power_limitation_raw
         device_address: !secret sungrow_modbus_device_address
@@ -1250,8 +1250,8 @@ modbus:
 
       # MG5-6RL is not supported.
       # 0-1000
-	  # Updated Reg from 13089 # reg 13090 to 31204 # reg 31205
-	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      # Updated Reg from 13089 # reg 13090 to 31204 # reg 31205
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
       - name: Active power limitation ratio raw
         unique_id: sg_active_power_limitation_ratio_raw
         device_address: !secret sungrow_modbus_device_address
@@ -1797,7 +1797,7 @@ template:
               entity_id: sensor.export_power_limit
 
       # Added 6/3/26 JT
-	  # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
+      # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
       - name: Active Power Limit (W)
         unique_id: uid_active_power_limit_w
         min: "0"
