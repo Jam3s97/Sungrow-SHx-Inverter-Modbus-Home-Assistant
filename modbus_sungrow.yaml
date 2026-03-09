@@ -587,19 +587,21 @@ modbus:
         scan_interval: *scan_interval_fast
 
       # https://www.photovoltaikforum.com/thread/166134-daten-lesen-vom-sungrow-wechselrichtern-modbus/?postID=3324464#post3324464
-      - name: Meter phase A voltage
-        unique_id: sg_meter_phase_a_voltage
-        device_address: !secret sungrow_modbus_device_address
-        address: 5740 # reg 5741
-        input_type: input
-        data_type: int16
-        nan_value: 0x7FFF
-        precision: 1
-        unit_of_measurement: V
-        device_class: voltage
-        state_class: measurement
-        scale: 0.1
-        scan_interval: *scan_interval_fast
+      # Also not avialble on my inverter.
+      # Strange as Meter phase A active power is availble.
+      # - name: Meter phase A voltage
+      #  unique_id: sg_meter_phase_a_voltage
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5740 # reg 5741
+      #  input_type: input
+      #  data_type: int16
+      #  nan_value: 0x7FFF
+      #  precision: 1
+      #  unit_of_measurement: V
+      #  device_class: voltage
+      #  state_class: measurement
+      #  scale: 0.1
+      #  scan_interval: *scan_interval_fast
 
       # - name: Meter phase B voltage
       #  unique_id: sg_meter_phase_b_voltage
@@ -629,19 +631,21 @@ modbus:
       #  scale: 0.1
       #  scan_interval: *scan_interval_fast
 
-      - name: Meter phase A current
-        unique_id: sg_meter_phase_a_current
-        device_address: !secret sungrow_modbus_device_address
-        address: 5743 # reg 5744
-        input_type: input
-        data_type: uint16
-        nan_value: 0xFFFF
-        precision: 2
-        unit_of_measurement: A
-        device_class: current
-        state_class: measurement
-        scale: 0.01
-        scan_interval: *scan_interval_fast
+      # Also not avialble on my inverter.
+      # Strange as Meter phase A active power is availble.
+      # - name: Meter phase A current
+      #  unique_id: sg_meter_phase_a_current
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: 5743 # reg 5744
+      #  input_type: input
+      #  data_type: uint16
+      #  nan_value: 0xFFFF
+      #  precision: 2
+      #  unit_of_measurement: A
+      #  device_class: current
+      #  state_class: measurement
+      #  scale: 0.01
+      #  scan_interval: *scan_interval_fast
 
       # - name: Meter phase B current
       #  unique_id: sg_meter_phase_b_current
