@@ -10,8 +10,8 @@ modbus:
     type: tcp
     host: !secret sungrow_modbus_host_ip
     port: !secret sungrow_modbus_port
-    delay: 0 # delay 5 second after connecting # adjusted down to zero to test
-    timeout: 10 # timeout while waiting for a response before flodding the log with errors # adjusted down from 30 due to slow register updates
+    delay: 15 # delay 5 second after connecting
+    timeout: 30 # timeout while waiting for a response before flodding the log with errors
     message_wait_milliseconds: !secret sungrow_modbus_wait_milliseconds # delay between messages, depending on inverter connection
 
     sensors:
@@ -593,6 +593,7 @@ modbus:
         address: 5740 # reg 5741
         input_type: input
         data_type: int16
+        nan_value: 0x7FFF
         precision: 1
         unit_of_measurement: V
         device_class: voltage
@@ -606,6 +607,7 @@ modbus:
       #  address: 5741 # reg 5742
       #  input_type: input
       #  data_type: int16
+      #  nan_value: 0x7FFF
       #  precision: 1
       #  unit_of_measurement: V
       #  device_class: voltage
@@ -619,6 +621,7 @@ modbus:
       #  address: 5742 # reg 5743
       #  input_type: input
       #  data_type: int16
+      #  nan_value: 0x7FFF
       #  precision: 1
       #  unit_of_measurement: V
       #  device_class: voltage
@@ -632,6 +635,7 @@ modbus:
         address: 5743 # reg 5744
         input_type: input
         data_type: uint16
+        nan_value: 0xFFFF
         precision: 2
         unit_of_measurement: A
         device_class: current
@@ -643,8 +647,9 @@ modbus:
       #  unique_id: sg_meter_phase_b_current
       #  device_address: !secret sungrow_modbus_device_address
       #  address: 5744 # reg 5745
-      # input_type: input
+      #  input_type: input
       #  data_type: uint16
+      #  nan_value: 0xFFFF
       #  precision: 2
       #  unit_of_measurement: A
       #  device_class: current
@@ -658,6 +663,7 @@ modbus:
       #  address: 5745 # reg 5746
       #  input_type: input
       #  data_type: uint16
+      #  nan_value: 0xFFFF
       #  precision: 2
       #  unit_of_measurement: A
       #  device_class: current
@@ -752,6 +758,7 @@ modbus:
         address: 13007 # reg 13008
         input_type: input
         data_type: int32
+        nan_value: 0x7FFFFFFF
         swap: word
         precision: 0
         unit_of_measurement: W
@@ -767,6 +774,7 @@ modbus:
         address: 13009 # reg 13010
         input_type: input
         data_type: int32
+        nan_value: 0x7FFFFFFF
         swap: word
         precision: 0
         unit_of_measurement: W
@@ -1788,6 +1796,10 @@ template:
                 {% if dev.startswith('SH') and 'RT' in dev %}
                   {# SH*RT* devices (e.g. SH10RT, SH8.0RT-20, SH8.0RT-V112 or SH10RT-V122) #}
                   {{ (value | float / 10) | int }}
+                {# 2026-03-08. Commented, it seems that a factor is not required for RS series, see: #666 and #677 #}
+                {# {% elif dev.startswith('SH') and 'RS' in dev %} #}
+                {#  SH*RS* devices (e.g. SH10RS)  #}
+                {#  {{ (value | float / 10) | int }} #}
                 {% else %}
                   {{ value | int }}
                 {% endif %}
