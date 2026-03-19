@@ -1119,6 +1119,7 @@ modbus:
         address: &sg_reg_cut_pv_gen 13017 # reg 13018
         input_type: holding
         data_type: uint16
+        nan_value: 0xFFFF
         state_class: measurement
         scan_interval: *scan_interval_fast
 
