@@ -1113,15 +1113,15 @@ modbus:
 
       # Added 6/3/26 JT
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
-      - name: Cut PV generation enable raw
-        unique_id: sg_cut_pv_generation_enable_raw
-        device_address: !secret sungrow_modbus_device_address
-        address: &sg_reg_cut_pv_gen 13017 # reg 13018
-        input_type: holding
-        data_type: uint16
-        nan_value: 0xFFFF
-        state_class: measurement
-        scan_interval: *scan_interval_fast
+      #- name: Cut PV generation enable raw
+      #  unique_id: sg_cut_pv_generation_enable_raw
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: &sg_reg_cut_pv_gen 13017 # reg 13018
+      #  input_type: holding
+      #  data_type: uint16
+      #  nan_value: 0xFFFF
+      #  state_class: measurement
+      #  scan_interval: *scan_interval_fast
 
       # Added 6/3/26 JT
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
@@ -1451,19 +1451,19 @@ modbus:
 
       # Added 6/3/26 JT
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
-      - name: Cut PV generation
-        unique_id: sg_cut_pv_generation
-        slave: !secret sungrow_modbus_device_address
-        address: *sg_reg_cut_pv_gen
-        write_type: holding
-        command_on: 170
-        command_off: 85
-        scan_interval: 10
-        verify:
-          input_type: holding
-          address: *sg_reg_cut_pv_gen
-          state_on: 170
-          state_off: 85
+      #- name: Cut PV generation
+      #  unique_id: sg_cut_pv_generation
+      #  slave: !secret sungrow_modbus_device_address
+      #  address: *sg_reg_cut_pv_gen
+      #  write_type: holding
+      #  command_on: 170
+      #  command_off: 85
+      #  scan_interval: 10
+      #  verify:
+      #    input_type: holding
+      #    address: *sg_reg_cut_pv_gen
+      #    state_on: 170
+      #    state_off: 85
 
       # Added 6/3/26 JT
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
