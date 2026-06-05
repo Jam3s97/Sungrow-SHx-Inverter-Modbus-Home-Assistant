@@ -1,4 +1,4 @@
-# Release date 2026-02-16
+# Release date 2026-04-27
 #
 # INSTALLATION GUIDE: https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/blob/main/doc/installation.md
 #
@@ -10,9 +10,10 @@ modbus:
     type: tcp
     host: !secret sungrow_modbus_host_ip
     port: !secret sungrow_modbus_port
-    delay: 15 # delay 5 second after connecting
-    timeout: 30 # timeout while waiting for a response before flodding the log with errors
+    delay: 2 # delay 5 second after connecting
+    timeout: 15 # timeout while waiting for a response before flodding the log with errors
     message_wait_milliseconds: !secret sungrow_modbus_wait_milliseconds # delay between messages, depending on inverter connection
+#   close_comm_on_error: true  # force TCP reconnect on error
 
     sensors:
       - name: Sungrow Version 1
@@ -584,7 +585,7 @@ modbus:
         device_class: power
         state_class: measurement
         scale: 1
-        scan_interval: *scan_interval_fast
+        scan_interval: &scan_interval_realtime 5
 
       # https://www.photovoltaikforum.com/thread/166134-daten-lesen-vom-sungrow-wechselrichtern-modbus/?postID=3324464#post3324464
       # Also not avialble on my inverter.
@@ -686,7 +687,7 @@ modbus:
         precision: 0
         scale: 1
         state_class: measurement
-        scan_interval: &scan_interval_realtime 5
+        scan_interval: *scan_interval_realtime
 
       # NOTE: In old modbus doc versions this was called "running state"
       # but has been renamed to "power flow status"
@@ -1112,6 +1113,7 @@ modbus:
         scan_interval: *scan_interval_fast
 
       # Added 6/3/26 JT
+      # Doesnt seem to work. doesn't return any value. Commented out 25/04/26
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
       #- name: Cut PV generation enable raw
       #  unique_id: sg_cut_pv_generation_enable_raw
@@ -1124,15 +1126,16 @@ modbus:
       #  scan_interval: *scan_interval_fast
 
       # Added 6/3/26 JT
+      # doesnt seem to work. returns value and can set but makes no difference to output. Commented out 25/04/26
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
-      - name: Cut PV generation 31212 enable raw
-        unique_id: sg_cut_pv_generation_31212_enable_raw
-        device_address: !secret sungrow_modbus_device_address
-        address: &sg_reg_cut_pv_gen_31212 31211 # reg 31212
-        input_type: holding
-        data_type: uint16
-        state_class: measurement
-        scan_interval: *scan_interval_fast
+      #- name: Cut PV generation 31212 enable raw
+      #  unique_id: sg_cut_pv_generation_31212_enable_raw
+      #  device_address: !secret sungrow_modbus_device_address
+      #  address: &sg_reg_cut_pv_gen_31212 31211 # reg 31212
+      #  input_type: holding
+      #  data_type: uint16
+      #  state_class: measurement
+      #  scan_interval: *scan_interval_fast
 
       # BUG: 2026-01-10. Deactivated for now, see issue #643
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/643
@@ -1466,20 +1469,21 @@ modbus:
       #    state_off: 85
 
       # Added 6/3/26 JT
+      # doesnt seem to work. returns value and can set but makes no difference to output. Commented out 25/04/26
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3605987033
-      - name: Cut PV generation 31212
-        unique_id: sg_cut_pv_generation_31212
-        slave: !secret sungrow_modbus_device_address
-        address: *sg_reg_cut_pv_gen_31212
-        write_type: holding
-        command_on: 170
-        command_off: 85
-        scan_interval: 10
-        verify:
-          input_type: holding
-          address: *sg_reg_cut_pv_gen_31212
-          state_on: 170
-          state_off: 85
+      #- name: Cut PV generation 31212
+      #  unique_id: sg_cut_pv_generation_31212
+      #  slave: !secret sungrow_modbus_device_address
+      #  address: *sg_reg_cut_pv_gen_31212
+      #  write_type: holding
+      #  command_on: 170
+      #  command_off: 85
+      #  scan_interval: 10
+      #  verify:
+      #    input_type: holding
+      #    address: *sg_reg_cut_pv_gen_31212
+      #    state_on: 170
+      #    state_off: 85
 
 sensor:
   - platform: filter
@@ -1808,10 +1812,6 @@ template:
                 {% else %}
                   {{ value | int }}
                 {% endif %}
-          # manually refresh modbus register
-          - action: homeassistant.update_entity
-            target:
-              entity_id: sensor.export_power_limit
 
       # Added 6/3/26 JT
       # https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant/issues/554#issuecomment-3170420960
@@ -1855,12 +1855,6 @@ template:
               slave: !secret sungrow_modbus_device_address
               address: *sg_reg_apl_shutdown_on_zero_raw
               value: "{{ disable_code }}"
-          - action: homeassistant.update_entity
-            target:
-              entity_id:
-                - sensor.active_power_limitation_ratio_raw
-                - sensor.active_power_limitation_raw
-                - sensor.apl_shutdown_at_zero_raw
 
   ####################
   # template: sensor
@@ -2453,13 +2447,8 @@ automation:
     alias: "sungrow max export scene sets rated limit"
     description: "When scenes with max export power are activated, set export limit to inverter rated output"
     triggers:
-      - platform: event
-        event_type: call_service
-        event_data:
-          domain: scene
-          service: turn_on
-          service_data:
-            entity_id: scene.max_export_power
+      - platform: state
+        entity_id: scene.max_export_power
     conditions: []
     action:
       - service: number.set_value
@@ -2473,13 +2462,8 @@ automation:
     alias: "sungrow self consumption mode max battery discharge scene sets rated limit"
     description: "When scenes with max battery discharge are activated, set battery discharge limit to sungrow_modbus_battery_max_power defined in secret"
     triggers:
-      - platform: event
-        event_type: call_service
-        event_data:
-          domain: scene
-          service: turn_on
-          service_data:
-            entity_id: scene.self_consumption_mode_max_battery_discharge
+      - platform: state
+        entity_id: scene.self_consumption_mode_max_battery_discharge
     conditions: []
     action:
       - service: number.set_value
